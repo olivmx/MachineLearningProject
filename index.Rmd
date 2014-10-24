@@ -1,7 +1,9 @@
 ---
 title: "Practical Machine Learning - Project Submission"
 author: "Oliverio Juarez Muñoz"
-output: html_document
+output:
+  html_document:
+    theme: cerulean
 ---
 ## Abstract 
 
@@ -19,14 +21,14 @@ The goal of your project is to predict the manner in which they did the exercise
 ## Getting Data
 ```{r echo=FALSE , results='hide'}
 #this code will now show is just to load needed libraries.
-setwd("C:\\TestR\\JHS_Dev_Data_Products\\project")
+setwd("C:\\TestR\\JHS_Machine_Learning\\MachineLearningProject")
 library(caret);library(ggplot2);library(gbm)
 ```
 
 The following R commands are to download training and test set for the study.
 ````{r cache=TRUE, results='hide'}
-rawTraining <- read.table("C:\\TestR\\JHS_Machine_Learning\\project\\pml-training.csv", sep=",", header=T)
-rawTesting <- read.table("C:\\TestR\\JHS_Machine_Learning\\project\\pml-testing.csv", sep=",", header=T)
+rawTraining <- read.table("C:\\TestR\\JHS_Machine_Learning\\pml-training.csv", sep=",", header=T)
+rawTesting <- read.table("C:\\TestR\\JHS_Machine_Learning\\pml-testing.csv", sep=",", header=T)
 ````
 
 ## Preprocessing
@@ -55,16 +57,18 @@ featurePlot(x=training[c("roll_belt", "pitch_belt", "yaw_belt","total_accel_belt
 
 ````
 
-## Model Fit
+## Model Fit and cross validation
 
-This commands will fit the **Boosting** model with the following parameters:  
+This commands will fit with the **Boosting** model with the following parameters:  
 1. Method: "gbm"  
 2. PreProcess: Principal Component Analysis  
 3. Validation: Bootstrapping (default)  
 4. folds: 25  (default)  
 5. resampling: 25  (default)  
    
-The principal component analysis is set to measure up to 90% of variations to avoid overfitting of the training set. A total of 19 components are nedded for this accuracy.
+The principal component analysis is set to measure up to 90% of variations to avoid overfitting of the training set. Since many values are negative it won't be possible to apply logarithms so normal numeric values will be used. This results in a total of 19 components for the desired accuracy.  
+  
+Then the PC model is used as source for the boosting algorithm which will use bootstrapping as the cross validation method with 25 folds and 25 resamples.
   
 ````{r cache=TRUE}
 preProc <- preProcess (training[,5:57], method="pca" ,thresh = 0.90)
